@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAZZ WMS - Dashboard Gudang Lintasarta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased h-screen flex overflow-hidden">
+        
+    <!-- Sidebar Navigation Fixed -->
+    <aside class="w-64 bg-[#0F172A] text-slate-300 flex flex-col justify-between hidden md:flex flex-shrink-0 no-print h-screen sticky top-0 border-r border-slate-800">
+        <div>
+            <!-- Logo Section -->
+            <div class="p-5 flex items-center gap-3 border-b border-slate-800">
+                <div class="bg-blue-600 text-white font-black px-2.5 py-1.5 rounded-lg text-sm tracking-wider">
+                    WMS
+                </div>
+                <span class="text-xl font-extrabold tracking-tight text-white">NAZZ<span class="text-blue-500">WMS</span></span>
+            </div>
+
+            <!-- Menu Navigation -->
+            <nav class="p-4 space-y-6 text-sm">
+                <div>
+                    <div class="px-3 mb-2 text-[11px] font-bold text-slate-500 uppercase tracking-wider">MENU UTAMA</div>
+                    <div class="space-y-1">
+                        <a href="index.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-white bg-blue-600/90 font-medium text-sm transition shadow-sm shadow-blue-600/20">
+                            <i class="fa-solid fa-chart-pie text-base"></i> Dashboard Utama
+                        </a>
+                        <a href="barang mutasiv2.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition">
+                            <i class="fa-solid fa-right-left text-base"></i> Barang Masuk / Keluar
+                        </a>
+                        <a href="regenerate v2.html" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition">
+                            <i class="fa-solid fa-barcode text-base"></i> Cetak Label Barcode
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- User Profile Footer -->
+        <div class="p-4 border-t border-slate-800/80 flex items-center gap-3 bg-slate-900/40">
+            <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-inner">HD</div>
+            <div class="overflow-hidden">
+                <p class="text-sm font-semibold text-white leading-tight truncate">Hardynas</p>
+                <p class="text-[11px] text-slate-400 truncate">Auditor / Field Tech</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-6 lg:p-8 h-screen overflow-y-auto">
+        <div class="max-w-6xl mx-auto space-y-6">
+            
+            <!-- Header Banner -->
+            <header class="flex flex-col md:flex-row md:items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 gap-4">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-blue-100 text-blue-700 text-[10px] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">Warehouse</span>
+                        <span class="text-slate-400 text-xs">• Lintasarta Jayapura</span>
+                    </div>
+                    <h1 class="text-xl font-extrabold text-slate-900">Dashboard Inventaris Gudang</h1>
+                    <p class="text-xs text-slate-500 mt-0.5">Pantau ringkasan stok perangkat dan aktivitas mutasi barang operasional.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="barang mutasiv2.html" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-2 shadow-sm shadow-blue-600/20">
+                        <i class="fa-solid fa-plus"></i> Transaksi Mutasi Baru
+                    </a>
+                </div>
+            </header>
+
+            <!-- KPI Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Card 1: Master Barang -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Master Perangkat</p>
+                        <h3 id="dash-master-count" class="text-2xl font-black text-slate-800 mt-1">0 <span class="text-xs font-normal text-slate-400">Spec</span></h3>
+                    </div>
+                    <div class="w-11 h-11 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-base">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                    </div>
+                </div>
+
+                <!-- Card 2: Total Mutasi -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Riwayat</p>
+                        <h3 id="dash-total-mutasi" class="text-2xl font-black text-slate-800 mt-1">0 <span class="text-xs font-normal text-slate-400">Item</span></h3>
+                    </div>
+                    <div class="w-11 h-11 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-base">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                </div>
+
+                <!-- Card 3: Barang Masuk -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Barang Masuk</p>
+                        <h3 id="dash-masuk-count" class="text-2xl font-black text-emerald-600 mt-1">0 <span class="text-xs font-normal text-slate-400">Unit</span></h3>
+                    </div>
+                    <div class="w-11 h-11 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-base">
+                        <i class="fa-solid fa-arrow-down-left"></i>
+                    </div>
+                </div>
+
+                <!-- Card 4: Barang Keluar -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Barang Keluar</p>
+                        <h3 id="dash-keluar-count" class="text-2xl font-black text-rose-600 mt-1">0 <span class="text-xs font-normal text-slate-400">Unit</span></h3>
+                    </div>
+                    <div class="w-11 h-11 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-base">
+                        <i class="fa-solid fa-arrow-up-right"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions & Recent Activity -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Live Recent Activity Table (Span 2) -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-list-ul text-blue-600"></i> Mutasi Terbaru Gudang
+                        </h2>
+                        <a href="barang mutasiv2.html" class="text-xs text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1">
+                            Lihat Semua <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </a>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="text-slate-400 border-b border-slate-100 uppercase font-semibold">
+                                <tr>
+                                    <th class="pb-2">Waktu</th>
+                                    <th class="pb-2">Nama Perangkat</th>
+                                    <th class="pb-2">SN / Reg No</th>
+                                    <th class="pb-2">Tipe</th>
+                                    <th class="pb-2">Pergerakan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dash-recent-table" class="divide-y divide-slate-100 text-slate-700">
+                                <!-- Data diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quick Action Sidebar Widgets -->
+                <div class="space-y-6">
+                    
+                    <!-- Quick Navigation -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
+                        <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2 border-b border-slate-100 pb-3">
+                            <i class="fa-solid fa-bolt text-amber-500"></i> Akses Cepat Gudang
+                        </h2>
+                        
+                        <a href="barang mutasiv2.html" class="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition text-xs font-semibold text-slate-700 group border border-slate-100">
+                            <span class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-right-left text-slate-400 group-hover:text-blue-600"></i> Input Mutasi Perangkat
+                            </span>
+                            <i class="fa-solid fa-arrow-right text-[10px] text-slate-400 group-hover:text-blue-600"></i>
+                        </a>
+
+                        <a href="regenerate v2.html" class="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition text-xs font-semibold text-slate-700 group border border-slate-100">
+                            <span class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-barcode text-slate-400 group-hover:text-blue-600"></i> Cetak Barcode Label
+                            </span>
+                            <i class="fa-solid fa-arrow-right text-[10px] text-slate-400 group-hover:text-blue-600"></i>
+                        </a>
+                    </div>
+
+                    <!-- System Info -->
+                    <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-5 rounded-2xl shadow-sm space-y-3">
+                        <div class="flex items-center gap-2 text-xs font-bold text-blue-400 uppercase tracking-wider">
+                            <i class="fa-solid fa-circle-info"></i> Info WMS Gudang
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Pastikan setiap pengambilan perangkat keluar menyertakan **No. SPK / Tiket Gangguan** pada kolom keterangan.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Script Master Data & Logic Dashboard -->
+    <script src="master_barang.js"></script>
+    <script>
+        const STORAGE_KEY = 'nazz_wms_mutasi_data';
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadDashboardData();
+        });
+
+        function getNamaPerangkat(sn) {
+            if (typeof MASTER_BARANG === "undefined") return "Perangkat Tidak Dikenal";
+            if (!sn || sn.length < 13) return "Perangkat Tidak Dikenal";
+            const kodeSpec = sn.substring(0, 13);
+            return MASTER_BARANG[kodeSpec] || `Unknown Device (${kodeSpec})`;
+        }
+
+        function loadDashboardData() {
+            // 1. Hitung Master Perangkat Registered
+            if (typeof MASTER_BARANG !== "undefined") {
+                const masterCount = Object.keys(MASTER_BARANG).length;
+                document.getElementById('dash-master-count').innerHTML = `${masterCount} <span class="text-xs font-normal text-slate-400">Spec</span>`;
+            }
+
+            // 2. Load Data Mutasi dari LocalStorage
+            const rawData = localStorage.getItem(STORAGE_KEY);
+            const mutasiData = rawData ? JSON.parse(rawData) : [];
+
+            document.getElementById('dash-total-mutasi').innerHTML = `${mutasiData.length} <span class="text-xs font-normal text-slate-400">Item</span>`;
+
+            let masukCount = 0;
+            let keluarCount = 0;
+
+            mutasiData.forEach(item => {
+                if (item.tipe === 'MASUK') masukCount++;
+                if (item.tipe === 'KELUAR') keluarCount++;
+            });
+
+            document.getElementById('dash-masuk-count').innerHTML = `+${masukCount} <span class="text-xs font-normal text-slate-400">Unit</span>`;
+            document.getElementById('dash-keluar-count').innerHTML = `-${keluarCount} <span class="text-xs font-normal text-slate-400">Unit</span>`;
+
+            // 3. Render 5 Activity Terakhir
+            const recentTable = document.getElementById('dash-recent-table');
+            if (mutasiData.length === 0) {
+                recentTable.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-4 text-center text-slate-400 italic">Belum ada riwayat pergerakan barang gudang.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const recentItems = mutasiData.slice(0, 5); // Ambil 5 transaksi teratas
+            recentTable.innerHTML = recentItems.map(item => `
+                <tr class="hover:bg-slate-50/80 transition">
+                    <td class="py-2.5 text-slate-400 font-mono text-[11px]">${item.waktu}</td>
+                    <td class="py-2.5 font-semibold text-slate-800">${item.nama || getNamaPerangkat(item.sn)}</td>
+                    <td class="py-2.5 font-mono text-slate-600">${item.sn}</td>
+                    <td class="py-2.5">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${item.tipe === 'MASUK' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">
+                            ${item.tipe === 'MASUK' ? '+ MASUK' : '- KELUAR'}
+                        </span>
+                    </td>
+                    <td class="py-2.5 text-slate-600">${item.pergerakan}</td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
