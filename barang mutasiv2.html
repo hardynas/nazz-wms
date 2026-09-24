@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NAZZ WMS - Mutasi Barang</title>
+    <title>NAZZ WMS - Mutasi Barang (Auto-Name & Single Scan)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Pustaka Barcode Scanner Camera -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex">
         
-       <!-- Sidebar Navigation -->
+    <!-- Sidebar Navigation -->
     <aside class="w-64 bg-[#0F172A] text-slate-300 flex flex-col justify-between hidden md:flex flex-shrink-0 no-print min-h-screen border-r border-slate-800">
         <div>
             <!-- Logo Section -->
@@ -72,19 +74,28 @@
                 </div>
             </header>
 
-            <!-- Form Transaksi Mutasi -->
+            <!-- Form Input Perangkat -->
             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-5">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-pen-to-square text-blue-600 text-sm"></i> Input Mutasi Perangkat
+                        <i class="fa-solid fa-pen-to-square text-blue-600 text-sm"></i> Input & Pindai Perangkat
                     </h2>
+                    <span class="text-xs bg-blue-50 text-blue-700 font-medium px-2.5 py-1 rounded-lg">
+                        Tahap 1: Pengumpulan Item
+                    </span>
                 </div>
                 
-                <form onsubmit="handleMutasi(event)" class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                    <div>
-                        <label class="text-xs font-semibold text-slate-600 block mb-1.5">No Registrasi / SN</label>
-                        <input type="text" id="m-no-reg" required placeholder="Masukkan SN Device" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-slate-50/50 focus:bg-white transition">
+                <form id="form-input-item" onsubmit="addDraftItem(event)" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div class="md:col-span-2">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-xs font-semibold text-slate-600 block">No Registrasi / SN</label>
+                            <button type="button" onclick="openScannerModal()" class="text-xs text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-lg transition">
+                                <i class="fa-solid fa-camera"></i> Scan Kamera
+                            </button>
+                        </div>
+                        <input type="text" id="m-no-reg" required placeholder="Ketik atau Scan SN Device" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-slate-50/50 focus:bg-white transition">
                     </div>
+
                     <div>
                         <label class="text-xs font-semibold text-slate-600 block mb-1.5">Tipe Mutasi</label>
                         <select id="m-tipe" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
@@ -92,6 +103,7 @@
                             <option value="KELUAR">Barang Keluar (-)</option>
                         </select>
                     </div>
+
                     <div>
                         <label class="text-xs font-semibold text-slate-600 block mb-1.5">Pergerakan</label>
                         <select id="m-pergerakan" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
@@ -101,38 +113,77 @@
                             <option value="Cabutan">Cabutan</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="text-xs font-semibold text-slate-600 block mb-1.5">Jumlah (Qty)</label>
-                        <input type="number" id="m-qty" min="1" required placeholder="1" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
-                    </div>
+
                     <div>
                         <label class="text-xs font-semibold text-slate-600 block mb-1.5">Keterangan / SPK</label>
                         <input type="text" id="m-ket" required placeholder="No. SPK / Tiket" class="w-full border border-slate-200 rounded-xl p-2.5 text-sm bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
                     </div>
-                    <div class="md:col-span-5 flex justify-end pt-2">
-                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition shadow-sm shadow-emerald-600/20 flex items-center gap-2">
-                            <i class="fa-solid fa-floppy-disk"></i> Simpan Mutasi
+
+                    <div class="md:col-span-5 flex justify-end">
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition shadow-sm flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Tambahkan Perangkat ke List
                         </button>
                     </div>
                 </form>
             </div>
 
-            <!-- Tabel Riwayat Mutasi -->
+            <!-- TABEL DRAFT / LIST SEMENTARA SEBELUM DISIMPAN -->
+            <div class="bg-white rounded-2xl border border-indigo-100 shadow-sm p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-indigo-600 text-sm"></i> List Draf Perangkat Terkumpul 
+                            <span id="draft-count-badge" class="bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full font-bold">0 Item</span>
+                        </h2>
+                        <p class="text-xs text-slate-500">Periksa dan edit daftar di bawah ini sebelum menyimpan ke riwayat resmi.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="clearDrafts()" class="text-xs text-slate-500 hover:text-slate-700 font-semibold px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition">
+                            Kosongkan Draf
+                        </button>
+                        <button type="button" onclick="saveAllDrafts()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2 rounded-xl text-sm transition shadow-sm shadow-emerald-600/20 flex items-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i> Simpan Mutasi (Final)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-200/70">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-600 border-b border-slate-200/80 font-semibold text-xs uppercase tracking-wider">
+                            <tr>
+                                <th class="p-3.5">No</th>
+                                <th class="p-3.5">Nama Perangkat</th>
+                                <th class="p-3.5">SN Device</th>
+                                <th class="p-3.5">Tipe</th>
+                                <th class="p-3.5">Pergerakan</th>
+                                <th class="p-3.5">Keterangan</th>
+                                <th class="p-3.5 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-draft-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tabel Riwayat Mutasi Resmi -->
             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
                         <i class="fa-solid fa-clock-rotate-left text-blue-600 text-sm"></i> Riwayat Pergerakan Barang
                     </h2>
+                    <button onclick="clearHistory()" class="text-xs text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-1 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition">
+                        <i class="fa-solid fa-trash-can"></i> Hapus Riwayat
+                    </button>
                 </div>
                 <div class="overflow-x-auto rounded-xl border border-slate-200/70">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-slate-50 text-slate-600 border-b border-slate-200/80 font-semibold text-xs uppercase tracking-wider">
                             <tr>
                                 <th class="p-3.5">Waktu</th>
+                                <th class="p-3.5">Nama Perangkat</th>
                                 <th class="p-3.5">SN Device</th>
                                 <th class="p-3.5">Tipe</th>
                                 <th class="p-3.5">Pergerakan</th>
-                                <th class="p-3.5">Qty</th>
                                 <th class="p-3.5">Keterangan</th>
                             </tr>
                         </thead>
@@ -143,6 +194,277 @@
         </div>
     </main>
 
+    <!-- Modal Scanner Barcode -->
+    <div id="scannerModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-xl">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-qrcode text-blue-600"></i> Scan Barcode / QR Code
+                </h3>
+                <button type="button" onclick="closeScannerModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div id="reader" class="overflow-hidden rounded-xl border border-slate-200"></div>
+            <div class="text-xs text-slate-500 text-center">
+                Arahkan kamera ke Barcode. Setelah terbaca, teks otomatis terisi ke input No Registrasi.
+            </div>
+            <div class="flex justify-end pt-2">
+                <button type="button" onclick="closeScannerModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2 rounded-xl text-sm transition">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="mutasi.js"></script>
+    <script>
+       const STORAGE_KEY = 'nazz_wms_mutasi_data';
+let draftList = [];
+let html5QrCode = null;
+let MASTER_BARANG = {};
+
+// Dimuat otomatis saat halaman siap
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadMasterBarang();
+    renderDraftTable();
+    renderMutasiTable();
+});
+
+// Membaca file master_barang.json terpisah
+async function loadMasterBarang() {
+    try {
+        const response = await fetch('master_barang.json');
+        if (!response.ok) throw new Error("Gagal mengambil file JSON");
+        MASTER_BARANG = await response.json();
+        console.log("Master barang berhasil dimuat:", Object.keys(MASTER_BARANG).length, "item.");
+    } catch (error) {
+        console.error("Error load master_barang.json:", error);
+    }
+}
+
+// Mengambil Nama Perangkat berdasarkan 13 karakter awal SN / REG NO
+function getNamaPerangkat(sn) {
+    if (!sn || sn.length < 13) return "Perangkat Tidak Dikenal";
+    const kodeSpec = sn.substring(0, 13); // Mengambil karakter 1 s/d 13
+    return MASTER_BARANG[kodeSpec] || `Unknown Device (${kodeSpec})`;
+}
+
+        // 1. Menambahkan item ke Draf Sementara
+        function addDraftItem(e) {
+            if(e) e.preventDefault();
+            
+            const snInput = document.getElementById('m-no-reg');
+            const sn = snInput.value.trim();
+            const tipe = document.getElementById('m-tipe').value;
+            const pergerakan = document.getElementById('m-pergerakan').value;
+            const ket = document.getElementById('m-ket').value.trim();
+
+            if (!sn) return;
+
+            draftList.push({
+                id: Date.now() + Math.random(),
+                sn: sn,
+                nama: getNamaPerangkat(sn),
+                tipe: tipe,
+                pergerakan: pergerakan,
+                ket: ket
+            });
+
+            // Reset input SN & Kembalikan Fokus
+            snInput.value = '';
+            snInput.focus();
+
+            renderDraftTable();
+        }
+
+        // 2. Render Tabel Draf (Lengkap dengan Edit & Auto-update Nama saat SN diubah)
+        function renderDraftTable() {
+            const tbody = document.getElementById('table-draft-body');
+            document.getElementById('draft-count-badge').innerText = `${draftList.length} Item`;
+
+            if (draftList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada perangkat dalam draf. Silakan scan atau tambah perangkat di atas.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = draftList.map((item, index) => `
+                <tr class="hover:bg-slate-50/80 transition">
+                    <td class="p-3.5 text-xs text-slate-400 font-bold">${index + 1}</td>
+                    <td class="p-3.5 font-semibold text-slate-800 text-xs">
+                        ${item.nama}
+                    </td>
+                    <td class="p-3.5 font-medium font-mono">
+                        <input type="text" value="${item.sn}" onchange="updateDraftSN(${item.id}, this.value)" class="w-full bg-transparent border border-transparent hover:border-slate-300 focus:border-blue-500 focus:bg-white rounded px-2 py-1 text-slate-800">
+                    </td>
+                    <td class="p-3.5">
+                        <select onchange="updateDraftItem(${item.id}, 'tipe', this.value)" class="bg-transparent border border-transparent hover:border-slate-300 focus:border-blue-500 focus:bg-white rounded px-1 py-1 text-xs font-semibold ${item.tipe === 'MASUK' ? 'text-emerald-700' : 'text-rose-700'}">
+                            <option value="MASUK" ${item.tipe === 'MASUK' ? 'selected' : ''}>+ MASUK</option>
+                            <option value="KELUAR" ${item.tipe === 'KELUAR' ? 'selected' : ''}>- KELUAR</option>
+                        </select>
+                    </td>
+                    <td class="p-3.5">
+                        <select onchange="updateDraftItem(${item.id}, 'pergerakan', this.value)" class="bg-transparent border border-transparent hover:border-slate-300 focus:border-blue-500 focus:bg-white rounded px-1 py-1 text-xs text-slate-700">
+                            <option value="Stock" ${item.pergerakan === 'Stock' ? 'selected' : ''}>Stock</option>
+                            <option value="Gangguan" ${item.pergerakan === 'Gangguan' ? 'selected' : ''}>Gangguan</option>
+                            <option value="Pasang Baru" ${item.pergerakan === 'Pasang Baru' ? 'selected' : ''}>Pasang Baru</option>
+                            <option value="Cabutan" ${item.pergerakan === 'Cabutan' ? 'selected' : ''}>Cabutan</option>
+                        </select>
+                    </td>
+                    <td class="p-3.5">
+                        <input type="text" value="${item.ket}" onchange="updateDraftItem(${item.id}, 'ket', this.value)" class="w-full bg-transparent border border-transparent hover:border-slate-300 focus:border-blue-500 focus:bg-white rounded px-2 py-1 text-slate-700">
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <button onclick="removeDraftItem(${item.id})" class="text-slate-400 hover:text-rose-600 p-1 transition" title="Hapus dari Draf">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateDraftSN(id, newSN) {
+            const item = draftList.find(d => d.id === id);
+            if (item) {
+                item.sn = newSN;
+                item.nama = getNamaPerangkat(newSN); // Otomatis perbarui nama jika SN diedit
+                renderDraftTable();
+            }
+        }
+
+        function updateDraftItem(id, field, value) {
+            const item = draftList.find(d => d.id === id);
+            if (item) {
+                item[field] = value;
+                renderDraftTable();
+            }
+        }
+
+        function removeDraftItem(id) {
+            draftList = draftList.filter(d => d.id !== id);
+            renderDraftTable();
+        }
+
+        function clearDrafts() {
+            if (draftList.length === 0) return;
+            if (confirm("Kosongkan semua daftar draf perangkat?")) {
+                draftList = [];
+                renderDraftTable();
+            }
+        }
+
+        // 3. Simpan Seluruh Draf ke Riwayat Resmi
+        function saveAllDrafts() {
+            if (draftList.length === 0) {
+                alert("Draf kosong! Silakan tambahkan atau scan perangkat terlebih dahulu.");
+                return;
+            }
+
+            const currentMutasi = getMutasiData();
+            const now = new Date().toLocaleString('id-ID');
+
+            draftList.forEach(item => {
+                currentMutasi.unshift({
+                    waktu: now,
+                    nama: item.nama,
+                    sn: item.sn,
+                    tipe: item.tipe,
+                    pergerakan: item.pergerakan,
+                    ket: item.ket
+                });
+            });
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentMutasi));
+            
+            if (typeof handleMutasi === "function") {
+                try { handleMutasi(); } catch(err){}
+            }
+
+            alert(`Berhasil menyimpan ${draftList.length} item ke Riwayat Mutasi!`);
+            draftList = [];
+            renderDraftTable();
+            renderMutasiTable();
+        }
+
+        // 4. Pengelolaan Tabel Riwayat Resmi
+        function getMutasiData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function renderMutasiTable() {
+            const tbody = document.getElementById('table-mutasi-body');
+            const data = getMutasiData();
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada riwayat mutasi resmi yang tersimpan.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = data.map(item => `
+                <tr class="hover:bg-slate-50/80 transition">
+                    <td class="p-3.5 text-xs text-slate-500 whitespace-nowrap">${item.waktu}</td>
+                    <td class="p-3.5 font-semibold text-slate-800 text-xs">${item.nama || getNamaPerangkat(item.sn)}</td>
+                    <td class="p-3.5 font-medium font-mono text-slate-800">${item.sn}</td>
+                    <td class="p-3.5">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${item.tipe === 'MASUK' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">
+                            ${item.tipe === 'MASUK' ? '+ MASUK' : '- KELUAR'}
+                        </span>
+                    </td>
+                    <td class="p-3.5 text-slate-600">${item.pergerakan}</td>
+                    <td class="p-3.5 text-slate-600">${item.ket}</td>
+                </tr>
+            `).join('');
+        }
+
+        function clearHistory() {
+            if (confirm("Apakah Anda yakin ingin menghapus seluruh riwayat mutasi resmi?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                renderMutasiTable();
+            }
+        }
+
+        // 5. Fitur Kamera Barcode (Single Scan -> Isi SN -> Auto Close)
+        function openScannerModal() {
+            document.getElementById('scannerModal').classList.remove('hidden');
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("reader");
+            }
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 150 } },
+                (decodedText) => {
+                    const inputSN = document.getElementById('m-no-reg');
+                    inputSN.value = decodedText;
+                    closeScannerModal();
+                    inputSN.focus();
+                },
+                (errorMessage) => {}
+            ).catch(err => {
+                alert("Gagal membuka kamera: " + err);
+                closeScannerModal();
+            });
+        }
+
+        function closeScannerModal() {
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('scannerModal').classList.add('hidden');
+                }).catch(() => {
+                    document.getElementById('scannerModal').classList.add('hidden');
+                });
+            } else {
+                document.getElementById('scannerModal').classList.add('hidden');
+            }
+        }
+    </script>
 </body>
 </html>
