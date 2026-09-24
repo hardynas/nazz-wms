@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAZZ WMS - Generator Label Thermal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 bg-[#0F172A] text-slate-300 flex flex-col justify-between hidden md:flex flex-shrink-0 no-print min-h-screen border-r border-slate-800">
+        <div>
+            <!-- Logo Section -->
+            <div class="p-5 flex items-center gap-3 border-b border-slate-800/80">
+                <div class="bg-blue-600 text-white font-black px-2.5 py-1.5 rounded-xl text-xs tracking-wider shadow-md shadow-blue-600/30">
+                    WMS
+                </div>
+                <span class="text-lg font-bold tracking-tight text-white">NAZZ<span class="text-blue-500">WMS</span></span>
+            </div>
+
+            <!-- Menu Navigation -->
+            <nav class="p-4 space-y-6 text-sm">
+                <div>
+                  <div class="px-3 mb-2 text-[11px] font-bold text-slate-500 uppercase tracking-wider">MENU UTAMA</div>
+                    <div class="space-y-1">
+                        <button onclick="switchTab('so')" id="btn-tab-so" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition">
+                            <i class="fa-solid fa-boxes-stacked text-base"></i> Stock Opname Perangkat
+                        </button>
+                        <button onclick="switchTab('mutasi')" id="btn-tab-mutasi" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition text-left">
+                            <a href="barang mutasiv2.html" class="flex items-center gap-3 w-full">
+                                <i class="fa-solid fa-right-left text-base"></i> Barang Masuk / Keluar
+                            </a>
+                        </button>
+                        <!-- MENU: Cetak Label Barcode -->
+                        <button onclick="switchTab('cetak-label')" id="btn-tab-cetak-label" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-white bg-blue-600/90 font-medium text-sm transition shadow-sm shadow-blue-600/20 text-left">
+                            <a href="regenerate v2.html" class="flex items-center gap-3 w-full">
+                                <i class="fa-solid fa-barcode text-base"></i> Cetak Label Barcode
+                            </a>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- User Profile Footer -->
+        <div class="p-4 border-t border-slate-800/80 flex items-center gap-3 bg-slate-900/40">
+            <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-inner">HD</div>
+            <div class="overflow-hidden">
+                <p class="text-sm font-semibold text-white leading-tight truncate">Hardynas</p>
+                <p class="text-[11px] text-slate-400 truncate">Auditor / Field Tech</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-6 lg:p-8 overflow-y-auto">
+        <header class="max-w-5xl mx-auto w-full flex justify-between items-center mb-6 no-print">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-white p-2.5 rounded-xl transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <h1 class="text-xl font-bold text-white"><i class="fa-solid fa-barcode text-blue-500 mr-2"></i>Generator Label Thermal Lintasarta</h1>
+            </div>
+            <div class="flex gap-2">
+                <button id="btnDownloadPDF" onclick="downloadPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf"></i> Download PDF
+                </button>
+                <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i> Print
+                </button>
+            </div>
+        </header>
+
+        <div class="container mx-auto">
+            <div class="control-panel">
+                <h2>Generator Label Thermal Lintasarta</h2>
+                
+                <div class="form-group">
+                    <label>1. Upload Master Data Excel (.xlsx / .csv)</label>
+                    <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" />
+                </div>
+
+                <div class="form-group">
+                    <label>2. Atau Manual Test Input</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="manualReg" placeholder="REG NO" value="B2WN02860114A0063" />
+                        <input type="text" id="manualName" placeholder="SPEC NAME" value="TA5000 GPON OLT 8X SFP" />
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="generateManual()">Generate Manual Single</button>
+                    <button id="btnDownload" class="btn-print" onclick="downloadPDF()">📄 Download PDF </button>
+                </div>
+            </div>
+
+            <div id="labelsContainer"></div>
+        </div>
+    </main>
+
+  <script>
+    const { jsPDF } = window.jspdf;
+
+    // Link Logo Catbox AVIF
+    const LOGO_URL = "https://files.catbox.moe/um2n9d.avif";
+    let logoBase64Data = "";
+
+    // Fungsi konversi gambar URL ke Base64 agar tidak terblokir CORS
+    async function loadLogoBase64() {
+      try {
+        const response = await fetch(LOGO_URL);
+        const blob = await response.blob();
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+      } catch (err) {
+        console.error("Gagal memuat logo dari URL Catbox:", err);
+        return LOGO_URL;
+      }
+    }
+
+    function createLabelElement(regNo, specName, index) {
+      const card = document.createElement("div");
+      card.className = "label-card";
+      card.id = `label_card_${index}`;
+
+      card.innerHTML = `
+        <div class="reg-box">${regNo}</div>
+        <div class="logo-box">
+          <img src="${logoBase64Data || LOGO_URL}" alt="Lintasarta" />
+        </div>
+        <div class="info-box">
+          <div class="spec-name">${specName}</div>
+        </div>
+        <div class="qr-box">
+          <div id="qr_${index}" class="qr-canvas"></div>
+        </div>
+      `;
+
+      return card;
+    }
+
+    function renderQR(elementId, text) {
+      const targetEl = document.getElementById(elementId);
+      if (!targetEl) return;
+      targetEl.innerHTML = ""; 
+
+      new QRCode(targetEl, {
+        text: String(text),
+        width: 64,
+        height: 64,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+
+    function generateManual() {
+      const container = document.getElementById("labelsContainer");
+      container.innerHTML = "";
+
+      const reg = document.getElementById("manualReg").value.trim() || "B2WN02860114A0063";
+      const name = document.getElementById("manualName").value.trim() || "TA5000 GPON OLT 8X SFP";
+
+      const card = createLabelElement(reg, name, 0);
+      container.appendChild(card);
+      renderQR("qr_0", reg);
+    }
+
+    document.getElementById("excelFile").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        try {
+          const data = new Uint8Array(event.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const json = XLSX.utils.sheet_to_json(worksheet);
+
+          if (json.length === 0) {
+            alert("File Excel kosong!");
+            return;
+          }
+
+          const container = document.getElementById("labelsContainer");
+          container.innerHTML = ""; 
+
+          json.forEach((row, idx) => {
+            const regNo = row["REG NO"] || row["REG_NO"] || row["Reg No"] || row["NO REG"] || row["NO REGISTRASI"] || row["SPEC CODE"] || "";
+            const specName = row["SPEC NAME"] || row["SPEC_NAME"] || row["Spec Name"] || "";
+
+            const card = createLabelElement(regNo, specName, idx);
+            container.appendChild(card);
+            renderQR(`qr_${idx}`, regNo);
+          });
+
+          alert(`Berhasil memuat ${json.length} label stiker!`);
+        } catch (err) {
+          alert("Gagal membaca file Excel.");
+          console.error(err);
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
+
+    // GENERATOR PDF PER HALAMAN (90x30 MM PER INDIVIDUAL LABEL)
+    async function downloadPDF() {
+      const cards = document.querySelectorAll('.label-card');
+      const btn = document.getElementById('btnDownload');
+
+      if (cards.length === 0) {
+        alert("Belum ada label!");
+        return;
+      }
+
+      const originalText = btn.innerHTML;
+      btn.innerHTML = "⏳ Membuat PDF per halaman...";
+      btn.disabled = true;
+
+      const pdf = new jsPDF({
+        orientation: 'l',
+        unit: 'mm',
+        format: [90, 30]
+      });
+
+      for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        
+        card.style.border = "none";
+
+        const canvas = await html2canvas(card, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: "#ffffff"
+        });
+
+        card.style.border = "1px dashed #666";
+
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+        if (i > 0) {
+          pdf.addPage([90, 30], 'l');
+        }
+
+        pdf.addImage(imgData, 'JPEG', 0, 0, 90, 30);
+      }
+
+      pdf.save('Label-Lintasarta.pdf');
+
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+
+    window.onload = async function() {
+      // Ambil data Base64 gambar dari link Catbox saat halaman pertama dimuat
+      logoBase64Data = await loadLogoBase64();
+      generateManual();
+    };
+  </script>
+</body>
+</html>
